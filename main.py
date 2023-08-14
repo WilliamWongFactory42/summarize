@@ -10,7 +10,10 @@ def open_file(filepath):
   with open(filepath, 'r', encoding='utf-8') as infile:
     return infile.read()
 
-my_secret = os.environ['OPENAI_API_KEY']
+try:
+    my_secret = os.environ['OPENAI_API_KEY']
+except:
+    print("Warning: OPENAI_API_KEY is not defined")
 
 def read_pdf(filename):
   context = ""
