@@ -3,15 +3,17 @@ import openai
 from nltk.tokenize import sent_tokenize
 from io import StringIO
 import json
+import os
+import sys
 
 def open_file(filepath):
-  with open(filepath, ‘r’, encoding=’utf-8') as infile:
-  return infile.read()
+  with open(filepath, 'r', encoding='utf-8') as infile:
+    return infile.read()
 
-openai.api_key = open_file(‘openai_key.txt’)
+my_secret = os.environ['OPENAI_API_KEY']
 
 def read_pdf(filename):
-  context = “”
+  context = ""
   
   # Open the PDF file
   with fitz.open(filename) as pdf_file:
@@ -74,18 +76,18 @@ def split_text(text, chunk_size=5000):
 
 def gpt3_completion(prompt, engine='text-davinci-003', temp=0.5, top_p=0.3, tokens=1000):
 
-prompt = prompt.encode(encoding='ASCII',errors='ignore').decode()
-try:
-  response = openai.Completion.create(
-  engine=engine,
-  prompt=prompt,
-  temperature=temp,
-  top_p=top_p,
-  max_tokens=tokens
-  )
-  return response.choices[0].text.strip()
-except Exception as oops:
-  return "GPT-3 error: %s" % oops
+  prompt = prompt.encode(encoding='ASCII',errors='ignore').decode()
+  try:
+    response = openai.Completion.create(
+    engine=engine,
+    prompt=prompt,
+    temperature=temp,
+    top_p=top_p,
+    max_tokens=tokens
+    )
+    return response.choices[0].text.strip()
+  except Exception as oops:
+    return "GPT-3 error: %s" % oops
 
 
 def summrize(documnet):
@@ -95,18 +97,18 @@ def summrize(documnet):
   
   summaries = []
   for chunk in chunks:
-    prompt = “Please summarize the following documnet: \n”
+    prompt = "Please summarize the following documnet: \n"
     summary = gpt3_completion(prompt + chunk)
 
-    if summary.startswith(“GPT-3 error:”):
+    if summary.startswith("GPT-3 error:"):
         continue
 
     summaries.append(summary)
-  return ‘’.join(summaries)
+  return ''.join(summaries)
 
 
 #read the pdf file
-document = read_pdf(‘filename.pdf’)
+document = read_pdf('charlie-and-the-chocolate-factory-by-roald-dahl.pdf')
 
 # Call the summrize function with the document as input
 summrize(document)
